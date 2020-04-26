@@ -5,9 +5,10 @@ category: "Angular"
 tags: ['Angular','library']
 ---
 
-# Angular Cli를 기능을 활용하여 라이브러리 만들기-1
+# Angular Cli를 기능을 활용하여 라이브러리 만들기-122121s
 
 [https://byeonggi.github.io/blog/angular-cli%EB%A5%BC-%EA%B8%B0%EB%8A%A5%EC%9D%84-%ED%99%9C%EC%9A%A9%ED%95%98%EC%97%AC-%EB%9D%BC%EC%9D%B4%EB%B8%8C%EB%9F%AC%EB%A6%AC-%EB%A7%8C%EB%93%A4%EA%B8%B0-1](https://byeonggi.github.io/blog/angular-cli%EB%A5%BC-%EA%B8%B0%EB%8A%A5%EC%9D%84-%ED%99%9C%EC%9A%A9%ED%95%98%EC%97%AC-%EB%9D%BC%EC%9D%B4%EB%B8%8C%EB%9F%AC%EB%A6%AC-%EB%A7%8C%EB%93%A4%EA%B8%B0-1)
+ddd
 
 - Angular library Project 를 생성 합니다.
 - createApplication flag는 기본적으로 true이며, 일반적인 최초 app 프로젝트 생성시 이 flag가 활성화되어 생성된다.([참고](https://angular.io/cli/new))

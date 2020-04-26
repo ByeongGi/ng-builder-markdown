@@ -5,9 +5,16 @@ catagory: "BDD"
 tags: ['BDD','TEST 코드','Jasmine','TDD']
 ---
 
-# 1. BDD 기본 개념 및 기타 개념 
+# 1. BDD 기본 개념 및 잘되고 있니 dss
+ddd
+dsdasdsaddsd
 
-## 1-1. BDD 기본 개념
+sdasdsadsadsadsad
+
+dsdasd
+dddsd
+
+## 1-1. BDD 기본 개념d
 - Given : 초기 상황, "어떤 버튼은"
 - When : 어떤 이벤트가 발생, "클릭하면"
 - Then : 후속결과를 기대, "결고창을 띄운다"

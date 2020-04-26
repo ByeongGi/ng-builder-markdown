@@ -1,5 +1,4 @@
 import {access, mkdir} from 'fs';
-import {v4 as uuidv4} from 'uuid';
 
 export function makeDirectory(path: string): Promise<boolean> {
   return new Promise((resolve, rejects) => {
@@ -21,6 +20,3 @@ export function makeDirectory(path: string): Promise<boolean> {
   });
 }
 
-export function getUUId() {
-  return uuidv4().replace(/-/g, '');
-}

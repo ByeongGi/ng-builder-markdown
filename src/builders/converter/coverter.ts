@@ -1,7 +1,7 @@
 import {basename} from 'path';
 import {Glob, IGlob} from 'glob';
 import matter from 'gray-matter';
-import {access, mkdir, readFile} from 'fs';
+import {readFile} from 'fs';
 import {MarkDownFileInfo, MarkDownFileInfoList, MarkdownMetaInfo} from '../model/model';
 import {VFile} from 'vfile';
 import remark from 'remark';
@@ -11,10 +11,9 @@ import recommendedLint from 'remark-preset-lint-recommended';
 import remarkHTML from 'remark-html';
 // @ts-ignore
 import highlightJs from 'remark-highlight.js';
-import {v4 as uuidv4} from 'uuid';
 import {Observable} from 'rxjs';
 
-export function findPathMarkdownFiles(path: string): Observable<MarkDownFileInfoList> {
+export function findPathMarkdownFilesObs(path: string): Observable<MarkDownFileInfoList> {
   const markdownExtension = '**/*.md';
   return new Observable<MarkDownFileInfoList>((obs) => {
     const g: IGlob = new Glob(markdownExtension, {
@@ -43,7 +42,7 @@ export function findPathMarkdownFiles(path: string): Observable<MarkDownFileInfo
   });
 }
 
-export function readMarkdownFile({fileName, filePath}: MarkDownFileInfo): Observable<MarkdownMetaInfo> {
+export function readMarkdownFileObs({fileName, filePath}: MarkDownFileInfo): Observable<MarkdownMetaInfo> {
   return new Observable<MarkdownMetaInfo>((obs) => {
     readFile(filePath, {encoding: 'utf8'}, (err, data) => {
       if (err) {
@@ -51,6 +50,7 @@ export function readMarkdownFile({fileName, filePath}: MarkDownFileInfo): Observ
         obs.complete();
       } else {
         try {
+          /* TODO : refactoring 파일을 읽는 부분과 변환 하는 부분을 분리해야 할 것 같다.*/
           const markdownMetaInfo = matter(data);
           const {contents} = markdownToHTML(markdownMetaInfo.content);
           obs.next({
@@ -81,26 +81,3 @@ export function markdownToHTML(content: string): VFile {
       .processSync(content);
 }
 
-export function makeDirectory(path: string): Promise<boolean> {
-  return new Promise((resolve, rejects) => {
-    access(path, err => {
-      if (err) {
-        mkdir(path, {recursive: true}, (err) => {
-          if (err) {
-            console.log('Not create cache directory');
-            rejects(new Error('Not create cache directory'));
-          } else {
-            resolve(true);
-          }
-        });
-      } else {
-        console.log('Exist cache directory');
-        resolve(true);
-      }
-    });
-  });
-}
-
-export function getUUId() {
-  return uuidv4().replace(/-/g, '');
-}

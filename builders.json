@@ -1,7 +1,8 @@
 {
+  "$schema": "./node_modules/@angular-devkit/architect/src/builders-schema.json",
   "builders": {
     "markdown": {
-      "implementation": "./src/builders/index",
+      "implementation": "./dist/builders/index",
       "schema": "./src/builders/schema.json",
       "description": "Runs any command line in the operating system."
     }

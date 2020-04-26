@@ -26,13 +26,6 @@ describe('Command Runner Builder', () => {
     console.log('#', Array.from((architectHost as any)._builderMap.keys()));
   });
 
-  // it('run test', async (done) => {
-  //   runMarkdownFsWatcher('./markdown').subscribe((res) => {
-  //     console.log('res', res);
-  //     setTimeout(()=>done(), 50000)
-  //   });
-  // }, 100000000);
-
   // This might not work in Windows.
   it('can run ls', async (done) => {
     // Create a logger that keeps an array of all messages that were logged.
@@ -43,13 +36,21 @@ describe('Command Runner Builder', () => {
     // A "run" can contain multiple outputs, and contains progress information.
 
     const run = await architect.scheduleBuilder('ng-markdown:markdown', {
-      path: './markdown/',
-      args: [__dirname],
+      path: 'markdown/',
+      paths: [
+          {
+            "glob": "**/*", "input": "src/markdown/", "output": "/assets/"
+          },
+      ],
+      inputFilePath :[],
+      outputFileName: "",
+      output : "",
     }, {logger});  // We pass the logger for checking later.
 
     // The "result" member is the next output of the runner.
     // This is of type BuilderOutput.
-    // const output = await run.result;
+    const output = await run.result;
+    console.log(output);
 
     // Stop the builder from running. This really stops Architect from keeping
     // the builder associated states in memory, since builders keep waiting

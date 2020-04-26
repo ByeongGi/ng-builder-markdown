@@ -1,56 +1,70 @@
 import {from, Observable, of} from 'rxjs';
-import {BuilderContext, BuilderOutput, createBuilder} from '@angular-devkit/architect';
-import {join, JsonObject, normalize} from '@angular-devkit/core';
-import {watch} from 'chokidar';
-import {catchError, map, mergeMap, scan, switchMap, tap} from 'rxjs/operators';
-import {findPathMarkdownFiles, readMarkdownFile} from './converter/utils';
-import {writeFileSync} from 'fs';
+import {BuilderContext, createBuilder} from '@angular-devkit/architect';
+import {join, normalize} from '@angular-devkit/core';
+import {FSWatcher, watch} from 'chokidar';
+import {catchError, debounceTime, map, mergeMap, scan, switchMap, tap} from 'rxjs/operators';
+import {findPathMarkdownFilesObs, readMarkdownFileObs} from './converter/coverter';
+import {writeFile} from 'fs';
+import {FileWatcherResult, Options} from './model/model';
+import {error, info, logo} from './utils/log';
 
-export interface Options extends JsonObject {
-  path: string;
-}
-
-
-export function runMarkdownFsWatcher(options: Options | any, context: BuilderContext) {
-  const markdownPath = join(normalize(context.workspaceRoot), options.path);
-  console.log('config Executing', markdownPath);
-  const logger = context.logger;
-  const watcher = watch(markdownPath, {
+export function createWatcherObs(markdownPath: string): Observable<FileWatcherResult> {
+  const watcher: FSWatcher = watch(markdownPath, {
     interval: 200,
     alwaysStat: true,
   });
-
-  return new Observable<{ eventName: string, path: string, detail: string } | BuilderOutput | any>((obs) => {
-    context.reportStatus('EXEC.........');
+  return new Observable<FileWatcherResult>((obs) => {
     watcher.on('all', (eventName, path, details) => {
       obs.next({eventName, path, details});
     });
     watcher.on('error', (error) => {
       obs.error(error);
     });
-
     return () => {
       watcher.close();
       obs.complete();
     };
-  }).pipe(
+  });
+}
+
+export function runMarkdownFsWatcher(options: Options | any, context: BuilderContext) {
+
+  logo();
+  const logger = context.logger;
+  const markdownPath = join(normalize(context.workspaceRoot), options.path);
+  const outputPath = join(normalize(context.workspaceRoot), '/data.json');
+  // console.log('>>>>>>>> options', options);
+
+  return createWatcherObs(markdownPath).pipe(
+      tap(result => {
+        const msg = `File ${result.eventName} :: ${result.path}`;
+        info(msg);
+      }),
       switchMap(
-          () => findPathMarkdownFiles(markdownPath).pipe(
+          () => findPathMarkdownFilesObs(markdownPath).pipe(
+              /* TODO : refactoring */
               mergeMap((fileInfo) =>
                   from(fileInfo).pipe(
-                      mergeMap((metadata) => readMarkdownFile(metadata)),
+                      mergeMap((metadata) => readMarkdownFileObs(metadata)),
                   )
               ),
               scan((fileInfo, cur,) => [...fileInfo, cur], [])
           )
       ),
-      tap(_ => console.log('_', writeFileSync(join(normalize(context.workspaceRoot), '/data.json'), JSON.stringify(_, null, 2)))),
+      debounceTime(1000),
+      tap(_ =>
+          writeFile(outputPath, JSON.stringify(_, null, 2), ( (err:Error) => {
+            if(err){
+              error(err)
+            }else {
+              info(`Output JSON ${outputPath}`)
+            }
+          }))
+      ),
       catchError((err) => of(err)),
       map((result) => {
         if (result instanceof Error) {
           logger.error(result.message);
-        } else {
-          logger.info(result);
         }
         return {success: true};
       }),

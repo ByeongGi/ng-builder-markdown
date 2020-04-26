@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "baseUrl": "tsconfig",
+    "rootDir": "src",
     "target": "es6",
     "declaration": true,
     "module": "commonjs",
@@ -17,6 +17,7 @@
     "strictNullChecks": true,
     "types": ["node", "jasmine"],
     "outDir": "dist",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "resolveJsonModule": true
   }
 }
