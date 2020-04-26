@@ -2,7 +2,7 @@ import {basename} from 'path';
 import {Glob, IGlob} from 'glob';
 import matter from 'gray-matter';
 import {access, mkdir, readFile} from 'fs';
-import {MarkDownFileInfo, MarkDownFileInfoList, MarkdownMetaInfo} from './model/model';
+import {MarkDownFileInfo, MarkDownFileInfoList, MarkdownMetaInfo} from '../model/model';
 import {VFile} from 'vfile';
 import remark from 'remark';
 // @ts-ignore
@@ -44,7 +44,6 @@ export function findPathMarkdownFiles(path: string): Observable<MarkDownFileInfo
 }
 
 export function readMarkdownFile({fileName, filePath}: MarkDownFileInfo): Observable<MarkdownMetaInfo> {
-  console.log('filePath<<<<<',filePath);
   return new Observable<MarkdownMetaInfo>((obs) => {
     readFile(filePath, {encoding: 'utf8'}, (err, data) => {
       if (err) {
