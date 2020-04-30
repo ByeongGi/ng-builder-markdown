@@ -29,7 +29,7 @@ describe('Command Runner Builder', () => {
   // This might not work in Windows.
   it('can run ls', async (done) => {
     // Create a logger that keeps an array of all messages that were logged.
-    const logger = new logging.Logger('ng-markdown:markdown' );
+    const logger = new logging.Logger('ng-markdown:markdown');
     // const logs: string[] = [];
     logger.subscribe((ev: { message: string; }) => console.log(ev));
 
@@ -38,13 +38,13 @@ describe('Command Runner Builder', () => {
     const run = await architect.scheduleBuilder('ng-markdown:markdown', {
       path: 'markdown/',
       paths: [
-          {
-            "glob": "**/*", "input": "src/markdown/", "output": "/assets/"
-          },
+        {
+          'glob': '**/*', 'input': 'src/markdown/', 'output': '/assets/'
+        },
       ],
-      inputFilePath :[],
-      outputFileName: "",
-      output : "",
+      inputFilePath: [],
+      outputFileName: '',
+      output: '',
     }, {logger});  // We pass the logger for checking later.
 
     // The "result" member is the next output of the runner.
@@ -56,11 +56,10 @@ describe('Command Runner Builder', () => {
     // the builder associated states in memory, since builders keep waiting
     // to be scheduled.
 
-    setTimeout(async ()=> {
+    setTimeout(async () => {
       await run.stop();
       done();
-    }, 200000000)
-
+    }, 200000000);
 
 
     // Expect that it succeeded.

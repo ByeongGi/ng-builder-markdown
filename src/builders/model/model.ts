@@ -1,22 +1,22 @@
 import {Stats} from 'fs';
 import {JsonObject} from '@angular-devkit/core';
 
-export interface MarkdownMetaInfo {
-  data: { [key: string]: any }
-  content: string
-  filePath: string;
-  fileName: string;
-  html: string;
-}
 
 export interface MarkDownFileInfo {
-  filePath: string;
-  fileName: string;
+  path: string;
+  name: string;
+}
+
+export interface MarkdownFile {
+  data: { [key: string]: any }
+  content: string
+  path: string;
+  name: string;
 }
 
 
 export type MarkDownFileInfoList = MarkDownFileInfo[];
-export type MarkdownMetaInfoList = MarkdownMetaInfo[];
+export type MarkdownFileList = MarkdownFile[];
 
 export interface Options extends JsonObject {
   path: string;
