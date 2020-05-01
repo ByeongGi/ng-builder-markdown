@@ -10,8 +10,8 @@ import {error, info} from './utils/log';
 import {logo} from './utils/logo';
 import {findFileForMarkdown} from './file/find-file-for-markdown';
 
-export function writeJsonFile(outputPath: string, markdownfileList: MarkdownFileList): void {
-  return writeFile(outputPath, JSON.stringify(markdownfileList, null, 2), (err: Error) => {
+export function writeJsonFile(outputPath: string): (markdownFileList: MarkdownFileList) => void {
+  return markdownFileList => writeFile(outputPath, JSON.stringify(markdownFileList, null, 2), (err: Error) => {
     if (err) {
       error(err);
     } else {
@@ -38,17 +38,15 @@ export function run(options: Options | any, context: BuilderContext) {
               /* TODO : refactoring */
               mergeMap((fileInfoList) =>
                   from(fileInfoList).pipe(
-                      mergeMap((metadata) => readFileForMarkdown(metadata))
+                      mergeMap(readFileForMarkdown)
                   )
               ),
               scan((fileInfo, cur) => [...fileInfo, cur], [])
           )
       ),
       debounceTime(1000),
-      tap((_) =>
-          writeJsonFile(outputPath, _)
-      ),
-      catchError((err) => of(err)),
+      tap(writeJsonFile(outputPath)),
+      catchError(of),
       map((result) => {
         if (result instanceof Error) {
           logger.error(result.message);
