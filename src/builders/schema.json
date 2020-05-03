@@ -3,17 +3,69 @@
   "title": "NgMarkdown",
   "description": "Create MarkDown",
   "properties": {
-    "force": {
-      "type": "boolean",
-      "default": false,
-      "description": "Force a new deployment even if nothing has changed",
-      "alias": "f"
-    },
-    "path": {
+    "input": {
+      "$id": "#/properties/input",
       "type": "string",
-      "default": "",
-      "description": "파일 경로",
-      "alias": "p"
+      "title": "The Input Schema",
+      "description": "An explanation about the purpose of this instance.",
+      "default": "./"
+    },
+    "output": {
+      "$id": "#/properties/output",
+      "type": "object",
+      "title": "The Output Schema",
+      "description": "An explanation about the purpose of this instance.",
+      "additionalProperties": true,
+      "properties": {
+        "path": {
+          "$id": "#/properties/output/properties/path",
+          "type": "string",
+          "title": "The Path Schema",
+          "description": "An explanation about the purpose of this instance.",
+          "default": "./"
+        },
+        "name": {
+          "$id": "#/properties/output/properties/name",
+          "type": "string",
+          "title": "The Name Schema",
+          "description": "An explanation about the purpose of this instance.",
+          "default": "data"
+        },
+        "hash": {
+          "$id": "#/properties/output/properties/hash",
+          "type": "boolean",
+          "title": "The Hash Schema",
+          "description": "An explanation about the purpose of this instance.",
+          "default": true
+        }
+      }
+    },
+    "converter": {
+      "$id": "#/properties/converter",
+      "type": "object",
+      "title": "The Converter Schema",
+      "description": "An explanation about the purpose of this instance.",
+      "default": {
+        "transform": null
+      },
+      "examples": [
+        {
+          "transform": "./data-transfer.ts"
+        }
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "transform": {
+          "$id": "#/properties/converter/properties/transform",
+          "type": "string",
+          "title": "The Transform Schema",
+          "description": "An explanation about the purpose of this instance.",
+          "default": "",
+          "examples": [
+            "./data-transfer.ts"
+          ]
+        }
+      }
     }
   }
 }
