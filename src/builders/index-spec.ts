@@ -36,15 +36,8 @@ describe('Command Runner Builder', () => {
     // A "run" can contain multiple outputs, and contains progress information.
 
     const run = await architect.scheduleBuilder('ng-markdown:markdown', {
-      path: 'markdown/',
-      paths: [
-        {
-          'glob': '**/*', 'input': 'src/markdown/', 'output': '/assets/'
-        },
-      ],
-      inputFilePath: [],
-      outputFileName: '',
-      output: '',
+      input: './markdown',
+      output: { hash : false},
     }, {logger});  // We pass the logger for checking later.
 
     // The "result" member is the next output of the runner.

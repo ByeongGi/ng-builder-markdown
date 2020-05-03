@@ -6,7 +6,7 @@ import {FileWatcherResult} from '../model/model';
  * watch file
  * @param path
  */
-export function fileWatcher(path: string): Observable<FileWatcherResult> {
+export const fileWatcher = (path: string): Observable<FileWatcherResult> => {
   const defaultOption = {
     interval: 200,
     alwaysStat: true,
@@ -21,7 +21,6 @@ export function fileWatcher(path: string): Observable<FileWatcherResult> {
     });
     return () => {
       fsWatcher.close();
-      subscriber.complete();
     };
   });
-}
+};

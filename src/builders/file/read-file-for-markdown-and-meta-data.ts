@@ -7,7 +7,7 @@ import {Observable} from 'rxjs';
  *
  * @param MarkDownFileInfo
  */
-export function readFileForMarkdown({name, path}: MarkDownFileInfo) {
+export const readFileForMarkdownAndMetaData = ({name, path}: MarkDownFileInfo) => {
   return new Observable<MarkdownFile>((subscriber) => {
     readFile(path, {encoding: 'utf8'}, (err, data) => {
       if (err) {
@@ -22,14 +22,12 @@ export function readFileForMarkdown({name, path}: MarkDownFileInfo) {
             name: name,
             path: path,
           });
+          subscriber.complete();
         } catch (e) {
           subscriber.error(e);
           subscriber.complete();
         }
       }
     });
-    return () => {
-      subscriber.complete();
-    };
   });
-}
+};
