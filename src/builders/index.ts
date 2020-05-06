@@ -1,28 +1,30 @@
-import {BuilderContext, createBuilder} from '@angular-devkit/architect';
-import {join, normalize} from '@angular-devkit/core';
-import {writeFile} from 'fs';
-import {from, Observable, of} from 'rxjs';
-import {catchError, debounceTime, map, mergeMap, scan, switchMap, tap,} from 'rxjs/operators';
-import {readFileForMarkdownAndMetaData} from './file/read-file-for-markdown-and-meta-data';
-import {fileWatcher} from './file/file-watcher';
-import {
-  FileWatcherResult,
-  MarkdownConvertBuilderResult,
-  MarkDownFileInfo,
-  MarkDownFileInfoList,
-  MarkdownFileList,
-  Options
-} from './model/model';
-import {error, info} from './utils/log';
-import {logo} from './utils/logo';
-import {findFileForMarkdown} from './file/find-file-for-markdown';
-import {uuid} from './utils/uuid';
+import { BuilderContext, createBuilder } from '@angular-devkit/architect';
+import { join, normalize } from '@angular-devkit/core';
+import { writeFile } from 'fs';
+import { from, Observable, of } from 'rxjs';
+import { catchError, debounceTime, map, mergeMap, scan, switchMap, tap } from 'rxjs/operators';
+import { fileWatcher } from './file/file-watcher';
+import { findFileForMarkdown } from './file/find-file-for-markdown';
+import { readFileForMarkdownAndMetaData } from './file/read-file-for-markdown-and-meta-data';
+import { FileWatcherResult, MarkdownConvertBuilderResult, MarkdownFile, MarkDownFileInfo, MarkDownFileInfoList, MarkdownFileList, Options } from './model/model';
+import { error, info } from './utils/log';
+import { logo } from './utils/logo';
+import { loadTsRegister } from './utils/ts-register';
+import { uuid } from './utils/uuid';
 
 export const logFsWatch = () => tap<FileWatcherResult>(
     (result) => info(`File ${result.eventName} :: ${result.path}`)
 );
-export const writeJsonFile = (outputPath: string) => tap((markdownFileList: MarkdownFileList) => {
-  writeFile(outputPath, JSON.stringify(markdownFileList, null, 2), (err: Error) => {
+export const writeJsonFile = (outputPath: string, customTransform?: Function) => tap((markdownFileList: MarkdownFileList) => {
+  writeFile(outputPath, JSON.stringify(markdownFileList.map((val:MarkdownFile)=>{
+    if(customTransform){
+      return {
+        ...val,
+        transData : customTransform(val.content),
+      }  
+    }
+    return val;
+  }), null, 2), (err: Error) => {
     if (err) {
       error(err);
     } else {
@@ -53,6 +55,15 @@ export function run(options: Options | any, context: BuilderContext): Observable
   if (!mergeOptions.input) {
     throw new Error('Please set input option');
   }
+  let customTransform;
+  if (mergeOptions?.converter?.transform) {
+    loadTsRegister();
+    const customTransformConfig = join(normalize(context.workspaceRoot), mergeOptions.converter.transform);
+    // log(`>>>>>>>>>>. ${customTransformConfig}`)
+    const res = require(customTransformConfig);
+    customTransform = res.markdownToHTML;
+
+  }
 
   const markdownPath = join(normalize(context.workspaceRoot), mergeOptions.input);
   const outputPath = join(normalize(context.workspaceRoot), `${mergeOptions.output.path}/${mergeOptions.output.hash
@@ -70,7 +81,7 @@ export function run(options: Options | any, context: BuilderContext): Observable
           )
       ),
       debounceTime(1000),
-      writeJsonFile(outputPath),
+      writeJsonFile(outputPath, customTransform),
       catchError(err => of(err)),
       map((result) => {
         if (result instanceof Error) {

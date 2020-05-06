@@ -1,6 +1,7 @@
 import {Architect} from '@angular-devkit/architect';
 import {TestingArchitectHost} from '@angular-devkit/architect/testing';
 import {logging, normalize, schema} from '@angular-devkit/core';
+import { Options } from './model/model';
 
 const {join} = require('path');
 const projectRoot = normalize(process.cwd());
@@ -35,9 +36,13 @@ describe('Command Runner Builder', () => {
 
     // A "run" can contain multiple outputs, and contains progress information.
 
-    const run = await architect.scheduleBuilder('ng-markdown:markdown', {
+    const run = await architect.scheduleBuilder('ng-markdown:markdown', <Options>{
       input: './markdown',
       output: { hash : false},
+      converter: {
+        transform : 'src/builders/converter/coverter.ts'
+      }
+
     }, {logger});  // We pass the logger for checking later.
 
     // The "result" member is the next output of the runner.
