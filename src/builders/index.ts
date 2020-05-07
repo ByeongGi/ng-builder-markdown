@@ -3,18 +3,14 @@ import { join, normalize } from '@angular-devkit/core';
 import { writeFile } from 'fs';
 import { from, Observable, of } from 'rxjs';
 import { catchError, debounceTime, map, mergeMap, scan, switchMap, tap } from 'rxjs/operators';
-import { fileWatcher } from './file/file-watcher';
-import { findFileForMarkdown } from './file/find-file-for-markdown';
-import { readFileForMarkdownAndMetaData } from './file/read-file-for-markdown-and-meta-data';
-import { FileWatcherResult, MarkdownConvertBuilderResult, MarkdownFile, MarkDownFileInfo, MarkDownFileInfoList, MarkdownFileList, Options } from './model/model';
-import { error, info } from './utils/log';
-import { logo } from './utils/logo';
-import { loadTsRegister } from './utils/ts-register';
-import { uuid } from './utils/uuid';
+import { fileWatcher, findFileForMarkdown, readFileForMarkdownAndMetaData } from './file';
+import { FileWatcherResult, MarkdownConvertBuilderResult, MarkdownFile, MarkDownFileInfo, MarkDownFileInfoList, MarkdownFileList, Options } from './model';
+import { error, info, loadTsRegister, logo, uuid } from './utils';
 
 export const logFsWatch = () => tap<FileWatcherResult>(
     (result) => info(`File ${result.eventName} :: ${result.path}`)
 );
+
 export const writeJsonFile = (outputPath: string, customTransform?: Function) => tap((markdownFileList: MarkdownFileList) => {
   writeFile(outputPath, JSON.stringify(markdownFileList.map((val:MarkdownFile)=>{
     if(customTransform){
@@ -80,7 +76,7 @@ export function run(options: Options | any, context: BuilderContext): Observable
               scanMarkdownFileInfo()
           )
       ),
-      debounceTime(1000),
+      debounceTime(200),
       writeJsonFile(outputPath, customTransform),
       catchError(err => of(err)),
       map((result) => {

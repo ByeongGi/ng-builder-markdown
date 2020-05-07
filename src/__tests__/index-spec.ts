@@ -1,7 +1,7 @@
 import {Architect} from '@angular-devkit/architect';
 import {TestingArchitectHost} from '@angular-devkit/architect/testing';
 import {logging, normalize, schema} from '@angular-devkit/core';
-import { Options } from './model/model';
+import { Options } from '../builders/model/model';
 
 const {join} = require('path');
 const projectRoot = normalize(process.cwd());
