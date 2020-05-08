@@ -1,14 +1,14 @@
 ---
-title: BDD 기본 개념 및 기타 개념
+title: 111BDD 기본 개념 및 기타 개념11
 date: 2018-06-30 19:24:00
 catagory: "BDD"
 tags: ['BDD','TEST 코드','Jasmine','TDD']
 ---
-
-# 1. BDD 기본 개념 및 잘되고 있니 dss
+1212122121
+# 1dss
 ddd
 dsdasdsaddsd
-
+ㄴㄴ
 sdasdsadsadsadsad
 
 dsdasd

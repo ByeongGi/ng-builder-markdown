@@ -1,5 +1,5 @@
 import { BuilderContext, createBuilder } from '@angular-devkit/architect';
-import { join, normalize } from '@angular-devkit/core';
+import { join, normalize, getSystemPath } from '@angular-devkit/core';
 import { existsSync, writeFile } from 'fs';
 import { from, Observable, of } from 'rxjs';
 import { catchError, debounceTime, map, mergeMap, scan, switchMap, tap } from 'rxjs/operators';
@@ -43,10 +43,10 @@ export const scanMarkdownFileInfo = () => scan<MarkDownFileInfo, MarkDownFileInf
 
 export const getOupuputPath = (context: BuilderContext, mergeOptions: Options): string => {
 
-  const ouputPath = join(normalize(context.workspaceRoot), mergeOptions.output.path);
+  const ouputPath = getSystemPath(join(normalize(context.workspaceRoot), mergeOptions.output.path));
   const ouputFileName = mergeOptions.output.hash
-                      ? `${mergeOptions.output.name}-${uuid()}.json`
-                      : `${mergeOptions.output.name}.json`
+    ? `${mergeOptions.output.name}-${uuid()}.json`
+    : `${mergeOptions.output.name}.json`
   if (existsSync(ouputPath)) {
     return `${ouputPath}/${ouputFileName}`;
   } else {
@@ -56,7 +56,7 @@ export const getOupuputPath = (context: BuilderContext, mergeOptions: Options): 
 }
 
 export const getMarkdownPath = (context: BuilderContext, mergeOptions: Options): string => {
-  const path = join(normalize(context.workspaceRoot), mergeOptions.input);
+  const path = getSystemPath(join(normalize(context.workspaceRoot), mergeOptions.input));
   if (existsSync(path)) {
     return path;
   } else {
@@ -80,7 +80,7 @@ export function run(options: Options | any, context: BuilderContext): Observable
   let customTransform;
   if (mergeOptions?.converter?.transform) {
     loadTsRegister();
-    const customTransformConfig = join(normalize(context.workspaceRoot), mergeOptions.converter.transform);
+    const customTransformConfig = getSystemPath(join(normalize(context.workspaceRoot), mergeOptions.converter.transform));
     const res = require(customTransformConfig);
     customTransform = res.markdownToHTML;
   }
@@ -88,7 +88,7 @@ export function run(options: Options | any, context: BuilderContext): Observable
   const markdownPath = getMarkdownPath(context, mergeOptions);
   const outputPath = getOupuputPath(context, mergeOptions);
   // console.log('>>>>>>>> mergeOptions', mergeOptions);
-  // console.log('>>>>>>>> outputPath', outputPath);
+  console.log('>>>>>>>> markdownPath', markdownPath);
 
   return fileWatcher(markdownPath).pipe(
     logFsWatch(),
@@ -100,6 +100,7 @@ export function run(options: Options | any, context: BuilderContext): Observable
     ),
     debounceTime(200),
     writeJsonFile(outputPath, customTransform),
+    tap(_=>console.log(_)),
     catchError(err => of(err)),
     map((result) => {
       if (result instanceof Error) {

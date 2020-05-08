@@ -50,17 +50,17 @@ describe('Command Runner Builder', () => {
 
     // The "result" member is the next output of the runner.
     // This is of type BuilderOutput.
-    // const output = await run.result;
-    // console.log(output);
+    const output = await run.result;
+    console.log(output);
 
     // Stop the builder from running. This really stops Architect from keeping
     // the builder associated states in memory, since builders keep waiting
     // to be scheduled.
 
-    // setTimeout(async () => {
-    //   await run.stop();
-    //   done();
-    // }, 200000000);
+    setTimeout(async () => {
+      await run.stop();
+      done();
+    }, 200000000);
 
 
     // Expect that it succeeded.
