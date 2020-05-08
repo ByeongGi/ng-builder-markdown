@@ -20,9 +20,9 @@ export type MarkDownFileInfoList = MarkDownFileInfo[];
 export type MarkdownFileList = MarkdownFile[];
 
 export interface Options extends JsonObject {
-  input: string | null;
+  input: string;
   output: {
-    path: string | null;
+    path: string;
     name: string;
     hash: boolean;
   },

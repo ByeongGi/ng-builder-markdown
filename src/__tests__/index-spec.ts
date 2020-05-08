@@ -1,10 +1,10 @@
-import {Architect} from '@angular-devkit/architect';
-import {TestingArchitectHost} from '@angular-devkit/architect/testing';
-import {logging, normalize, schema} from '@angular-devkit/core';
-import { Options } from '../builders/model/model';
+import { Architect } from '@angular-devkit/architect';
+import { TestingArchitectHost } from '@angular-devkit/architect/testing';
+import { join, normalize, schema, logging , getSystemPath} from '@angular-devkit/core';
+import { Options } from '../builders/model';
 
-const {join} = require('path');
-const projectRoot = normalize(process.cwd());
+
+const projectRoot = getSystemPath( normalize(process.cwd()) );
 
 describe('Command Runner Builder', () => {
   let architect: Architect;
@@ -14,17 +14,20 @@ describe('Command Runner Builder', () => {
   beforeEach(async () => {
     const registry = new schema.CoreSchemaRegistry();
     registry.addPostTransform(schema.transforms.addUndefinedDefaults);
-
     // Arguments to TestingArchitectHost are workspace and current directories.
     // Since we don't use those, both are the same in this case.
+    console.log();
+    
     architectHost = new TestingArchitectHost(projectRoot, projectRoot);
     architect = new Architect(architectHost, registry);
+    console.log(architectHost.currentDirectory);
+    console.log(architect.scheduleBuilder);
 
 
     // This will either take a Node package name, or a path to the directory
     // for the package.json file.
-    await architectHost.addBuilderFromPackage(join(projectRoot, '.'));
-    console.log('#', Array.from((architectHost as any)._builderMap.keys()));
+    await architectHost.addBuilderFromPackage(projectRoot);
+    console.log('##', Array.from((architectHost as any)._builderMap.keys()));
   });
 
   // This might not work in Windows.
@@ -38,26 +41,26 @@ describe('Command Runner Builder', () => {
 
     const run = await architect.scheduleBuilder('ng-markdown:markdown', <Options>{
       input: './markdown',
-      output: { hash : false},
+      output: { hash: false },
       converter: {
-        transform : 'src/builders/converter/coverter.ts'
+        transform: 'src/builders/converter/coverter.ts'
       }
 
-    }, {logger});  // We pass the logger for checking later.
+    }, { logger });  // We pass the logger for checking later.
 
     // The "result" member is the next output of the runner.
     // This is of type BuilderOutput.
-    const output = await run.result;
-    console.log(output);
+    // const output = await run.result;
+    // console.log(output);
 
     // Stop the builder from running. This really stops Architect from keeping
     // the builder associated states in memory, since builders keep waiting
     // to be scheduled.
 
-    setTimeout(async () => {
-      await run.stop();
-      done();
-    }, 200000000);
+    // setTimeout(async () => {
+    //   await run.stop();
+    //   done();
+    // }, 200000000);
 
 
     // Expect that it succeeded.
