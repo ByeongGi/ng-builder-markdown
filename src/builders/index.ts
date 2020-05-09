@@ -45,8 +45,8 @@ export const getOupuputPath = (context: BuilderContext, mergeOptions: Options): 
 
   const ouputPath = getSystemPath(join(normalize(context.workspaceRoot), mergeOptions.output.path));
   const ouputFileName = mergeOptions.output.hash
-    ? `${mergeOptions.output.name}-${uuid()}.json`
-    : `${mergeOptions.output.name}.json`
+                        ? `${mergeOptions.output.name}-${uuid()}.json`
+                        : `${mergeOptions.output.name}.json`
   if (existsSync(ouputPath)) {
     return `${ouputPath}/${ouputFileName}`;
   } else {
@@ -56,6 +56,9 @@ export const getOupuputPath = (context: BuilderContext, mergeOptions: Options): 
 }
 
 export const getMarkdownPath = (context: BuilderContext, mergeOptions: Options): string => {
+  if (mergeOptions.input) {
+    throw new Error("Please set input option");
+  }
   const path = getSystemPath(join(normalize(context.workspaceRoot), mergeOptions.input));
   if (existsSync(path)) {
     return path;
@@ -63,6 +66,19 @@ export const getMarkdownPath = (context: BuilderContext, mergeOptions: Options):
     throw Error('It is invaild path');
   }
 
+}
+
+export const getCustomTransformConfig = (context: BuilderContext, transform: string) => {
+    return getSystemPath(join(normalize(context.workspaceRoot), transform)); 
+}
+
+export const registerCustomTransfrom = (context: BuilderContext, mergeOptions: Options)=>{
+  if (mergeOptions?.converter?.transform) {
+    loadTsRegister();
+    const customTransformConfig = getCustomTransformConfig(context, mergeOptions.converter.transform);
+    const res = require(customTransformConfig);
+    return res.markdownToHTML;
+  }
 }
 
 
@@ -74,33 +90,20 @@ export function run(options: Options | any, context: BuilderContext): Observable
     ...options
   };
   const logger = context.logger;
-  if (!mergeOptions.input) {
-    throw new Error('Please set input option');
-  }
-  let customTransform;
-  if (mergeOptions?.converter?.transform) {
-    loadTsRegister();
-    const customTransformConfig = getSystemPath(join(normalize(context.workspaceRoot), mergeOptions.converter.transform));
-    const res = require(customTransformConfig);
-    customTransform = res.markdownToHTML;
-  }
-
+  const customTransform = registerCustomTransfrom(context, mergeOptions)
   const markdownPath = getMarkdownPath(context, mergeOptions);
   const outputPath = getOupuputPath(context, mergeOptions);
-  // console.log('>>>>>>>> mergeOptions', mergeOptions);
-  console.log('>>>>>>>> markdownPath', markdownPath);
 
   return fileWatcher(markdownPath).pipe(
     logFsWatch(),
     switchMap(() =>
       findFileForMarkdown(markdownPath).pipe(
         readFileMarkdown(),
-        scanMarkdownFileInfo()
+        scanMarkdownFileInfo(),
       )
     ),
     debounceTime(200),
     writeJsonFile(outputPath, customTransform),
-    tap(_=>console.log(_)),
     catchError(err => of(err)),
     map((result) => {
       if (result instanceof Error) {
@@ -112,4 +115,3 @@ export function run(options: Options | any, context: BuilderContext): Observable
 }
 
 export default createBuilder<Options>(run);
-
