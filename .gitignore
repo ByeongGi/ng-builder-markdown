@@ -8,3 +8,8 @@ node_modules
 data
 dist
 coverage
+
+
+# test data
+data.json
+markdown
