@@ -64,14 +64,14 @@ export const getOutputPath = (context: BuilderContext, mergeOptions: Options): s
 };
 
 export const getMarkdownPath = (context: BuilderContext, mergeOptions: Options): string => {
-  if (mergeOptions.input) {
+  if (!mergeOptions.input) {
     throw new Error('Please set input option');
   }
   const path = getSystemPath(join(normalize(context.workspaceRoot), mergeOptions.input));
   if (existsSync(path)) {
     return path;
   } else {
-    throw Error('It is invaild path');
+    throw Error('It is invalid path');
   }
 
 };
