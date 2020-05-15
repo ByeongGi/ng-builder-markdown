@@ -16,7 +16,6 @@ describe('Command Runner Builder', () => {
     registry.addPostTransform(schema.transforms.addUndefinedDefaults);
     // Arguments to TestingArchitectHost are workspace and current directories.
     // Since we don't use those, both are the same in this case.
-    console.log();
 
     architectHost = new TestingArchitectHost(projectRoot, projectRoot);
     architect = new Architect(architectHost, registry);
@@ -70,4 +69,6 @@ describe('Command Runner Builder', () => {
     // `ls $__dirname`.
     // expect(logs.toString()).toContain('index-spec.ts');
   }, 999999999);
+
+
 });

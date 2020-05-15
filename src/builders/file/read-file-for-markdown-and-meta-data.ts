@@ -1,6 +1,6 @@
 import matter from 'gray-matter';
 import {readFile} from 'fs';
-import {MarkdownFile, MarkDownFileInfo} from '../model/model';
+import {MarkdownFile, MarkDownFileInfo} from '../model';
 import {Observable} from 'rxjs';
 
 /**

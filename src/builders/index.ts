@@ -80,7 +80,7 @@ export const getCustomTransformConfig = (context: BuilderContext, transform: str
   return getSystemPath(join(normalize(context.workspaceRoot), transform));
 };
 
-export const registerCustomTransfrom = (context: BuilderContext, mergeOptions: Options) => {
+export const registerCustomTransform = (context: BuilderContext, mergeOptions: Options) => {
   if (mergeOptions?.converter?.transform) {
     loadTsRegister();
     const customTransformConfig = getCustomTransformConfig(context, mergeOptions.converter.transform);
@@ -96,7 +96,7 @@ export function run(options: Options | any, context: BuilderContext): Observable
     ...options
   };
   const logger = context.logger;
-  const customTransform = registerCustomTransfrom(context, mergeOptions);
+  const customTransform = registerCustomTransform(context, mergeOptions);
   const markdownPath = getMarkdownPath(context, mergeOptions);
   const outputPath = getOutputPath(context, mergeOptions);
 
