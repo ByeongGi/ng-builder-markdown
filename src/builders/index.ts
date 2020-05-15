@@ -1,14 +1,22 @@
-import { BuilderContext, createBuilder } from '@angular-devkit/architect';
-import { join, normalize, getSystemPath } from '@angular-devkit/core';
-import { existsSync, writeFile } from 'fs';
-import { from, Observable, of } from 'rxjs';
-import { catchError, debounceTime, map, mergeMap, scan, switchMap, tap } from 'rxjs/operators';
-import { fileWatcher, findFileForMarkdown, readFileForMarkdownAndMetaData } from './file';
-import { FileWatcherResult, MarkdownConvertBuilderResult, MarkdownFile, MarkDownFileInfo, MarkDownFileInfoList, MarkdownFileList, Options } from './model';
-import { error, info, loadTsRegister, logo, uuid } from './utils';
+import {BuilderContext, createBuilder} from '@angular-devkit/architect';
+import {getSystemPath, join, normalize} from '@angular-devkit/core';
+import {existsSync, writeFile} from 'fs';
+import {from, Observable, of} from 'rxjs';
+import {catchError, debounceTime, map, mergeMap, scan, switchMap, tap} from 'rxjs/operators';
+import {fileWatcher, findFileForMarkdown, readFileForMarkdownAndMetaData} from './file';
+import {
+  FileWatcherResult,
+  MarkdownConvertBuilderResult,
+  MarkdownFile,
+  MarkDownFileInfo,
+  MarkDownFileInfoList,
+  MarkdownFileList,
+  Options
+} from './model';
+import {error, info, loadTsRegister, logo, uuid} from './utils';
 
 export const logFsWatch = () => tap<FileWatcherResult>(
-  (result) => info(`File ${result.eventName} :: ${result.path}`)
+    (result) => info(`File ${result.eventName} :: ${result.path}`)
 );
 
 export const writeJsonFile = (outputPath: string, customTransform?: Function) => tap((markdownFileList: MarkdownFileList) => {
@@ -17,7 +25,7 @@ export const writeJsonFile = (outputPath: string, customTransform?: Function) =>
       return {
         ...val,
         transData: customTransform(val.content),
-      }
+      };
     }
     return val;
   }), null, 2), (err: Error) => {
@@ -31,33 +39,33 @@ export const writeJsonFile = (outputPath: string, customTransform?: Function) =>
 
 
 export const readFileMarkdown = () => mergeMap((fileInfoList: MarkDownFileInfoList) =>
-  from<MarkDownFileInfoList>(fileInfoList).pipe(
-    mergeMap(readFileForMarkdownAndMetaData)
-  )
+    from<MarkDownFileInfoList>(fileInfoList).pipe(
+        mergeMap(readFileForMarkdownAndMetaData)
+    )
 );
 
 export const scanMarkdownFileInfo = () => scan<MarkDownFileInfo, MarkDownFileInfoList>(
-  (fileInfo, cur) => [...fileInfo, cur],
-  []
+    (fileInfo, cur) => [...fileInfo, cur],
+    []
 );
 
-export const getOupuputPath = (context: BuilderContext, mergeOptions: Options): string => {
+export const getOutputPath = (context: BuilderContext, mergeOptions: Options): string => {
 
   const ouputPath = getSystemPath(join(normalize(context.workspaceRoot), mergeOptions.output.path));
   const ouputFileName = mergeOptions.output.hash
-                        ? `${mergeOptions.output.name}-${uuid()}.json`
-                        : `${mergeOptions.output.name}.json`
+      ? `${mergeOptions.output.name}-${uuid()}.json`
+      : `${mergeOptions.output.name}.json`;
   if (existsSync(ouputPath)) {
     return `${ouputPath}/${ouputFileName}`;
   } else {
     throw Error('It is invaild path');
   }
 
-}
+};
 
 export const getMarkdownPath = (context: BuilderContext, mergeOptions: Options): string => {
   if (mergeOptions.input) {
-    throw new Error("Please set input option");
+    throw new Error('Please set input option');
   }
   const path = getSystemPath(join(normalize(context.workspaceRoot), mergeOptions.input));
   if (existsSync(path)) {
@@ -66,22 +74,20 @@ export const getMarkdownPath = (context: BuilderContext, mergeOptions: Options):
     throw Error('It is invaild path');
   }
 
-}
+};
 
 export const getCustomTransformConfig = (context: BuilderContext, transform: string) => {
-    return getSystemPath(join(normalize(context.workspaceRoot), transform)); 
-}
+  return getSystemPath(join(normalize(context.workspaceRoot), transform));
+};
 
-export const registerCustomTransfrom = (context: BuilderContext, mergeOptions: Options)=>{
+export const registerCustomTransfrom = (context: BuilderContext, mergeOptions: Options) => {
   if (mergeOptions?.converter?.transform) {
     loadTsRegister();
     const customTransformConfig = getCustomTransformConfig(context, mergeOptions.converter.transform);
     const res = require(customTransformConfig);
     return res.markdownToHTML;
   }
-}
-
-
+};
 
 
 export function run(options: Options | any, context: BuilderContext): Observable<MarkdownConvertBuilderResult> {
@@ -90,27 +96,27 @@ export function run(options: Options | any, context: BuilderContext): Observable
     ...options
   };
   const logger = context.logger;
-  const customTransform = registerCustomTransfrom(context, mergeOptions)
+  const customTransform = registerCustomTransfrom(context, mergeOptions);
   const markdownPath = getMarkdownPath(context, mergeOptions);
-  const outputPath = getOupuputPath(context, mergeOptions);
+  const outputPath = getOutputPath(context, mergeOptions);
 
   return fileWatcher(markdownPath).pipe(
-    logFsWatch(),
-    switchMap(() =>
-      findFileForMarkdown(markdownPath).pipe(
-        readFileMarkdown(),
-        scanMarkdownFileInfo(),
-      )
-    ),
-    debounceTime(200),
-    writeJsonFile(outputPath, customTransform),
-    catchError(err => of(err)),
-    map((result) => {
-      if (result instanceof Error) {
-        logger.error(result.message);
-      }
-      return { success: true };
-    })
+      logFsWatch(),
+      switchMap(() =>
+          findFileForMarkdown(markdownPath).pipe(
+              readFileMarkdown(),
+              scanMarkdownFileInfo(),
+          )
+      ),
+      debounceTime(200),
+      writeJsonFile(outputPath, customTransform),
+      catchError(err => of(err)),
+      map((result) => {
+        if (result instanceof Error) {
+          logger.error(result.message);
+        }
+        return {success: true};
+      })
   );
 }
 

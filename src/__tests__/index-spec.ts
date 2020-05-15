@@ -1,10 +1,10 @@
-import { Architect } from '@angular-devkit/architect';
-import { TestingArchitectHost } from '@angular-devkit/architect/testing';
-import { join, normalize, schema, logging , getSystemPath} from '@angular-devkit/core';
-import { Options } from '../builders/model';
+import {Architect} from '@angular-devkit/architect';
+import {TestingArchitectHost} from '@angular-devkit/architect/testing';
+import {getSystemPath, logging, normalize, schema} from '@angular-devkit/core';
+import {Options} from '../builders/model';
 
 
-const projectRoot = getSystemPath( normalize(process.cwd()) );
+const projectRoot = getSystemPath(normalize(process.cwd()));
 
 describe('Command Runner Builder', () => {
   let architect: Architect;
@@ -17,7 +17,7 @@ describe('Command Runner Builder', () => {
     // Arguments to TestingArchitectHost are workspace and current directories.
     // Since we don't use those, both are the same in this case.
     console.log();
-    
+
     architectHost = new TestingArchitectHost(projectRoot, projectRoot);
     architect = new Architect(architectHost, registry);
     console.log(architectHost.currentDirectory);
@@ -41,12 +41,12 @@ describe('Command Runner Builder', () => {
 
     const run = await architect.scheduleBuilder('ng-markdown:markdown', <Options>{
       input: './markdown',
-      output: { hash: false },
+      output: {hash: false},
       converter: {
         transform: 'src/builders/converter/coverter.ts'
       }
 
-    }, { logger });  // We pass the logger for checking later.
+    }, {logger});  // We pass the logger for checking later.
 
     // The "result" member is the next output of the runner.
     // This is of type BuilderOutput.

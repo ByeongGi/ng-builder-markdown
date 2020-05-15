@@ -1,6 +1,6 @@
 import {FSWatcher, watch} from 'chokidar';
 import {Observable} from 'rxjs';
-import {FileWatcherResult} from '../model/model';
+import {FileWatcherResult} from '../model';
 
 /**
  * watch file
