@@ -79,21 +79,20 @@ export const getMarkdownPath = (context: BuilderContext, mergeOptions: Options):
 };
 
 export const getCustomTransformConfig = (context: BuilderContext, transform: string) => {
-  return getSystemPath(join(normalize(context.workspaceRoot), transform));
+  const path = getSystemPath(join(normalize(context.workspaceRoot), transform));
+  if (existsSync(path)) {
+    return path;
+  } else {
+    throw Error('It is invalid path');
+  }
 };
 
 export const registerCustomTransform = (context: BuilderContext, mergeOptions: Options) => {
   if (mergeOptions?.converter?.transform) {
     loadTsRegister();
     const customTransformConfig = getCustomTransformConfig(context, mergeOptions.converter.transform);
-
-    try {
-      const res = require(customTransformConfig);
-      return res.markdownToHTML;
-    } catch (e) {
-      console.log('e-------------', e);
-    }
-
+    const transformFn = require(customTransformConfig);
+    return transformFn;
   }
 };
 
