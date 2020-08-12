@@ -12,4 +12,4 @@ coverage
 
 # test data
 data.json
-markdown
+src/__tests__/markdown
