@@ -30,23 +30,27 @@ describe('Command Runner Builder', () => {
   });
 
   // This might not work in Windows.
-  it('can run ls', async (done) => {
+  it('markdown 동작 확인', async (done) => {
     // Create a logger that keeps an array of all messages that were logged.
     const logger = new logging.Logger('ng-markdown:markdown');
     // const logs: string[] = [];
     logger.subscribe((ev: { message: string; }) => console.log(ev));
 
     // A "run" can contain multiple outputs, and contains progress information.
-
     const run = await architect.scheduleBuilder('ng-markdown:markdown', <Options>{
       input: './markdown',
-      output: {hash: false},
+      output: {
+        hash: false,
+        name: 'TEST',
+        path: './.data'
+      },
       converter: {
-        transform: 'src/builders/converter/coverter.ts'
+        transform: './src/__tests__/converter.ts'
       }
 
-    }, {logger});  // We pass the logger for checking later.
+    }, {logger});
 
+    // We pass the logger for checking later.
     // The "result" member is the next output of the runner.
     // This is of type BuilderOutput.
     const output = await run.result;
@@ -56,10 +60,10 @@ describe('Command Runner Builder', () => {
     // the builder associated states in memory, since builders keep waiting
     // to be scheduled.
 
-    setTimeout(async () => {
+    setTimeout(async () =>  {
       await run.stop();
       done();
-    }, 200000000);
+    }, 5000);
 
 
     // Expect that it succeeded.
@@ -68,7 +72,11 @@ describe('Command Runner Builder', () => {
     // Expect that this file was listed. It should be since we're running
     // `ls $__dirname`.
     // expect(logs.toString()).toContain('index-spec.ts');
-  }, 999999999);
+  }, 10000);
 
-
+  // it('', async (done) => {}, 10000);
+  //
+  // it('', async (done) => {}, 10000);
+  //
+  // it('', async (done) => {}, 10000);
 });

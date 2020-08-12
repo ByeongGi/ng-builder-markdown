@@ -4,7 +4,7 @@ import remarkHTML from 'remark-html';
 import recommendedLint from 'remark-preset-lint-recommended';
 
 
-export function markdownToHTML(content: string) {
+function markdownToHTML(content: string) {
   const {contents} = remark()
       .use(recommendedLint)
       .use(highlightJs)
@@ -13,6 +13,4 @@ export function markdownToHTML(content: string) {
   return contents;
 }
 
-module.exports = {
-  markdownToHTML
-};
+module.exports = markdownToHTML;
