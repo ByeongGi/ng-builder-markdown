@@ -15,12 +15,34 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "strictNullChecks": true,
-    "types": ["node", "jasmine"],
+    "types": [
+      "node",
+      "jasmine"
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "remark-preset-lint-recommended": [
+        "./src/types"
+      ],
+      "remark-html": [
+        "./src/types"
+      ],
+      "remark-highlight.js": [
+        "./src/types"
+      ]
+    },
     "outDir": "dist",
     "esModuleInterop": true,
     "resolveJsonModule": true
   },
   "ts-node": {
     "transpileOnly": true
-  }
+  },
+  "include": [
+    "./src/builders",
+    "./src/types"
+  ],
+  "exclude": [
+    "./src/__tests__"
+  ]
 }
