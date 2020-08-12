@@ -1,4 +1,4 @@
-import {access, mkdir} from 'fs';
+import {access, mkdir, mkdirSync} from 'fs';
 
 export function makeDirectory(path: string): Promise<boolean> {
   return new Promise((resolve, rejects) => {
@@ -20,3 +20,6 @@ export function makeDirectory(path: string): Promise<boolean> {
   });
 }
 
+export function makeDirectorySync(path: string): void {
+  mkdirSync(path, {recursive: true});
+}

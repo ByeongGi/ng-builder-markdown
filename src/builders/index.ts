@@ -13,7 +13,7 @@ import {
   MarkdownFileList,
   Options
 } from './model';
-import {error, info, loadTsRegister, logo, uuid} from './utils';
+import {error, info, loadTsRegister, logo, makeDirectorySync, uuid} from './utils';
 
 export const logFsWatch = () => tap<FileWatcherResult>(
     (result) => info(`File ${result.eventName} :: ${result.path}`)
@@ -58,7 +58,9 @@ export const getOutputPath = (context: BuilderContext, mergeOptions: Options): s
   if (existsSync(ouputPath)) {
     return `${ouputPath}/${ouputFileName}`;
   } else {
-    throw Error('It is invaild path');
+    makeDirectorySync(ouputPath);
+    return `${ouputPath}/${ouputFileName}`;
+    // throw Error('It is invaild path');
   }
 
 };
@@ -84,8 +86,14 @@ export const registerCustomTransform = (context: BuilderContext, mergeOptions: O
   if (mergeOptions?.converter?.transform) {
     loadTsRegister();
     const customTransformConfig = getCustomTransformConfig(context, mergeOptions.converter.transform);
-    const res = require(customTransformConfig);
-    return res.markdownToHTML;
+
+    try {
+      const res = require(customTransformConfig);
+      return res.markdownToHTML;
+    } catch (e) {
+      console.log('e-------------', e);
+    }
+
   }
 };
 
