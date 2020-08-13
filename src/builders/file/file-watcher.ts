@@ -3,7 +3,7 @@ import {Observable} from 'rxjs';
 import {FileWatcherResult} from '../model';
 
 /**
- * watch file
+ * Detects change in files in the specified path.
  * @param path
  */
 export const fileWatcher = (path: string): Observable<FileWatcherResult> => {

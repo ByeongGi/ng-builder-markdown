@@ -8,12 +8,12 @@ import {
   FileWatcherResult,
   MarkdownConvertBuilderResult,
   MarkdownFile,
-  MarkDownFileInfo,
   MarkDownFileInfoList,
   MarkdownFileList,
   Options
 } from './model';
 import {error, info, loadTsRegister, logo, makeDirectorySync, uuid} from './utils';
+import {NGMarkdownEvent} from './contants';
 
 export const logFsWatch = () => tap<FileWatcherResult>(
     (result) => info(`File ${result.eventName} :: ${result.path}`)
@@ -44,7 +44,7 @@ export const readFileMarkdown = () => mergeMap((fileInfoList: MarkDownFileInfoLi
     )
 );
 
-export const scanMarkdownFileInfo = () => scan<MarkDownFileInfo, MarkDownFileInfoList>(
+export const scanMarkdownFileInfo = () => scan<MarkdownFile, MarkdownFileList>(
     (fileInfo, cur) => [...fileInfo, cur],
     []
 );
@@ -55,13 +55,10 @@ export const getOutputPath = (context: BuilderContext, mergeOptions: Options): s
   const ouputFileName = mergeOptions.output.hash
       ? `${mergeOptions.output.name}-${uuid()}.json`
       : `${mergeOptions.output.name}.json`;
-  if (existsSync(ouputPath)) {
-    return `${ouputPath}/${ouputFileName}`;
-  } else {
+  if (!existsSync(ouputPath)) {
     makeDirectorySync(ouputPath);
-    return `${ouputPath}/${ouputFileName}`;
-    // throw Error('It is invaild path');
   }
+  return `${ouputPath}/${ouputFileName}`;
 
 };
 
@@ -96,7 +93,6 @@ export const registerCustomTransform = (context: BuilderContext, mergeOptions: O
   }
 };
 
-
 export function run(options: Options | any, context: BuilderContext): Observable<MarkdownConvertBuilderResult> {
   logo();
   const mergeOptions: Options = {
@@ -112,10 +108,11 @@ export function run(options: Options | any, context: BuilderContext): Observable
       switchMap(() =>
           findFileForMarkdown(markdownPath).pipe(
               readFileMarkdown(),
-              scanMarkdownFileInfo(),
-          )
+              scanMarkdownFileInfo()
+          ),
       ),
       debounceTime(200),
+      tap((markdownInfo) => logger.info(NGMarkdownEvent.FILE_INFO_RESULT, {'data': JSON.stringify(markdownInfo)})),
       writeJsonFile(outputPath, customTransform),
       catchError(err => of(err)),
       map((result) => {

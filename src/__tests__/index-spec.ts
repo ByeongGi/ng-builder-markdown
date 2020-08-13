@@ -2,6 +2,8 @@ import {Architect} from '@angular-devkit/architect';
 import {TestingArchitectHost} from '@angular-devkit/architect/testing';
 import {getSystemPath, logging, normalize, schema} from '@angular-devkit/core';
 import {Options} from '../builders/model';
+import {NGMarkdownEvent} from '../builders/contants';
+import {LogEntry} from '@angular-devkit/core/src/logger';
 
 
 const projectRoot = getSystemPath(normalize(process.cwd()));
@@ -19,8 +21,6 @@ describe('Command Runner Builder', () => {
 
     architectHost = new TestingArchitectHost(projectRoot, projectRoot);
     architect = new Architect(architectHost, registry);
-    console.log(architectHost.currentDirectory);
-    console.log(architect.scheduleBuilder);
 
 
     // This will either take a Node package name, or a path to the directory
@@ -30,11 +30,12 @@ describe('Command Runner Builder', () => {
   });
 
   // This might not work in Windows.
-  it('markdown 동작 확인', async (done) => {
-    // Create a logger that keeps an array of all messages that were logged.
+  it('Markdown File을 읽어 변환하여 File의 정보를 가져온다 ', async (done) => {
     const logger = new logging.Logger('ng-markdown:markdown');
-    // const logs: string[] = [];
-    logger.subscribe((ev: { message: string; }) => console.log(ev));
+    const logs: LogEntry[] = [];
+    logger.subscribe((ev) => {
+      logs.push(ev);
+    });
 
     // A "run" can contain multiple outputs, and contains progress information.
     const run = await architect.scheduleBuilder('ng-markdown:markdown', <Options>{
@@ -54,29 +55,16 @@ describe('Command Runner Builder', () => {
     // The "result" member is the next output of the runner.
     // This is of type BuilderOutput.
     const output = await run.result;
-    console.log(output);
+    logs.forEach((ev) => {
+      if (ev.message === NGMarkdownEvent.FILE_INFO_RESULT
+          && ev.data) {
+        const fileInfoList = JSON.parse(ev.data.toString());
+        expect(fileInfoList.length).toBeGreaterThan(0);
+      }
+    });
+    await run.stop();
 
-    // Stop the builder from running. This really stops Architect from keeping
-    // the builder associated states in memory, since builders keep waiting
-    // to be scheduled.
-
-    setTimeout(async () =>  {
-      await run.stop();
-      done();
-    }, 5000);
-
-
-    // Expect that it succeeded.
-    // expect(output.success).toBe(true);
-
-    // Expect that this file was listed. It should be since we're running
-    // `ls $__dirname`.
-    // expect(logs.toString()).toContain('index-spec.ts');
-  }, 10000);
-
-  // it('', async (done) => {}, 10000);
-  //
-  // it('', async (done) => {}, 10000);
-  //
-  // it('', async (done) => {}, 10000);
+    expect(output.success).toBe(true);
+    done();
+  }, 1000000);
 });
