@@ -5,7 +5,7 @@
 
 
 node_modules
-data
+.data
 dist
 coverage
 
