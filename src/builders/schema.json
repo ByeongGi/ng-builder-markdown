@@ -1,7 +1,7 @@
 {
   "id": "NgMarkdownSchema",
-  "title": "NgMarkdown",
-  "description": "Create MarkDown",
+  "title": "NgMarkdownBuilder",
+  "description": "Convert a Markdown file to a JSON file.",
   "properties": {
     "input": {
       "$id": "#/properties/input",

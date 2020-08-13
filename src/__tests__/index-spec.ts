@@ -22,7 +22,7 @@ describe('Command Runner Builder', () => {
     console.log('##', Array.from((architectHost as any)._builderMap.keys()));
   });
 
-  it('Markdown File을 읽어 변환하여 File의 정보를 가져온다 ', async (done) => {
+  it('Markdown File을 읽어 변환하여 File의 정보를 가져온다', async (done) => {
     const logger = new logging.Logger('ng-markdown:markdown');
     const logs: LogEntry[] = [];
     logger.subscribe((ev) => {
@@ -43,7 +43,7 @@ describe('Command Runner Builder', () => {
     }, {logger});
     const output = await run.result;
     logs.forEach((ev) => {
-      if (ev.message === NGMarkdownEvent.FILE_INFO_RESULT
+      if (ev.message === NGMarkdownEvent.FILE_INFO_SUCCESS
           && ev.data) {
         const fileInfoList = JSON.parse(ev.data.toString());
         expect(fileInfoList.length).toBeGreaterThan(0);
@@ -53,5 +53,5 @@ describe('Command Runner Builder', () => {
 
     expect(output.success).toBe(true);
     done();
-  }, 1000000);
+  }, 100000);
 });

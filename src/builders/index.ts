@@ -112,7 +112,7 @@ export function run(options: Options | any, context: BuilderContext): Observable
           ),
       ),
       debounceTime(200),
-      tap((markdownInfo) => logger.info(NGMarkdownEvent.FILE_INFO_RESULT, {'data': JSON.stringify(markdownInfo)})),
+      tap((markdownInfo) => logger.info(NGMarkdownEvent.FILE_INFO_SUCCESS, {'data': JSON.stringify(markdownInfo)})),
       writeJsonFile(outputPath, customTransform),
       catchError(err => of(err)),
       map((result) => {

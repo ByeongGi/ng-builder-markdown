@@ -1,7 +1,16 @@
 {
-  "name": "ng-markdown",
-  "version": "1.0.0",
-  "description": "",
+  "name": "ng-markdown-builder",
+  "version": "0.0.3",
+  "description": "ng-markdown-builder",
+  "keywords": [
+    "markdown",
+    "angular",
+    "custom-builder"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ByeongGi/ng-builder-markdown.git"
+  },
   "main": "./dist/builders/index.js",
   "scripts": {
     "build": "tsc",
@@ -35,7 +44,7 @@
     "figlet": "^1.5.0",
     "glob": "^7.1.6",
     "gray-matter": "^4.0.2",
-    "jasmine-node": "^1.16.2",
+    "jasmine-node": "^3.0.0",
     "rehype": "^9.0.1",
     "rehype-sanitize": "^3.0.0",
     "remark": "^11.0.2",
